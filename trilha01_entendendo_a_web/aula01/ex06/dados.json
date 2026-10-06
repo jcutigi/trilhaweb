@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "nome": "Bia",
+        "area": "Computação"
+    },
+    {
+        "id": 2,
+        "nome": "Alice",
+        "area": "Matemática"
+    },
+    {
+        "id": 3,
+        "nome": "Ana",
+        "area": "Engenharia de Software"
+    },
+    {
+        "id": 4,
+        "nome": "Catarina",
+        "area": "Banco de Dados"
+    }
+]

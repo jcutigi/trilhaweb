@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Minha primeira aplicacao Web</h1>
+
+    <p id="mensagem">Clique no botao.</p>
+
+    <button id="botao">Clique aqui</button>
+
+    <script>
+        const botao = document.querySelector("#botao");
+        
+        botao.addEventListener("click", function () {
+            const paragrafo = document.querySelector("#mensagem")
+            paragrafo.textContent = "O botão foi clicado!"
+        });
+    </script>
+</body>
+
+</html>

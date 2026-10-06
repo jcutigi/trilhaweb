@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Criando uma API</title>
+</head>
+
+<body>
+<h1>Professoras</h1>
+
+<ul id="lista"></ul>
+
+<p id="detalhes"></p>
+
+<script>
+    const lista = document.querySelector("#lista");
+    const detalhes = document.querySelector("#detalhes");
+
+    fetch("http://localhost:3000/api/professoras")
+        .then(function (resposta) {
+            return resposta.json();
+        })
+        .then(function (professoras) {
+
+            professoras.forEach(function (professora) {
+
+                const item = document.createElement("li");
+
+                item.textContent = professora.nome;
+                item.style.cursor = "pointer";
+
+                item.addEventListener("click", function () {
+
+                    fetch("http://localhost:3000/api/professoras/" + professora.id)
+                        .then(function (resposta) {
+                            return resposta.json();
+                        })
+                        .then(function (dados) {
+
+                            detalhes.textContent =
+                                dados.nome + " - " + dados.area;
+                        });
+                });
+
+                lista.appendChild(item);
+            });
+        });
+</script>
+</body>
+
+</html>
