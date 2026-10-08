@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Front-end + API com JSON</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Sistema de Cadastro de Professores com API e JSON</h1>
+
+    <form id="form-professor">
+
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome">
+
+        <label for="area">Área:</label>
+        <input type="text" id="area" name="area">
+
+        <button type="submit">Adicionar</button>
+
+    </form>
+
+    <h2>Professores cadastrados</h2>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Área</th>
+            </tr>
+        </thead>
+
+        <tbody id="tabela-professores">
+            <!-- Os professores serão inseridos aqui pelo JavaScript -->
+        </tbody>
+
+    </table>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
