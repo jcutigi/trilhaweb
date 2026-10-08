@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "nome": "Beatriz",
+        "area": "Computação"
+    },
+    {
+        "id": 2,
+        "nome": "Alice",
+        "area": "Matemática"
+    },
+    {
+        "id": 3,
+        "nome": "Ana",
+        "area": "Engenharia de Software"
+    },
+    {
+        "id": 4,
+        "nome": "Catarina",
+        "area": "Banco de Dados"
+    },
+    {
+        "id": 5,
+        "nome": "Carolina",
+        "area": "Inteligência Artificial"
+    },
+    {
+        "id": 6,
+        "nome": "Jorge",
+        "area": "Estrutura de Dados"
+    },
+    {
+        "id": 7,
+        "nome": "Joao",
+        "area": "Redes"
+    },
+    {
+        "id": 9,
+        "nome": "Manu",
+        "area": "Algoritmos"
+    },
+    {
+        "id": 10,
+        "nome": "Du",
+        "area": "Compiladores"
+    },
+    {
+        "id": 11,
+        "nome": "Carlos",
+        "area": "Sistemas Operacionais"
+    }
+]
