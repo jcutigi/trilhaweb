@@ -1,198 +1,170 @@
-# EX10 — Implementando o CRUD completo no frontend
+# EX11 — Tratamento de erros e validação
 
 ## Objetivo
 
-Neste exercício, vamos integrar a interface web à API desenvolvida nos exercícios anteriores, permitindo realizar todas as operações de cadastro de professores diretamente pelo navegador.
+Neste exercício, aprimoramos a aplicação de cadastro de professores, acrescentando tratamento de erros no frontend e validação dos dados no backend.
 
-Ao final, a aplicação permitirá:
+O objetivo é compreender que uma aplicação não deve apenas funcionar quando tudo dá certo. Ela também precisa identificar situações inesperadas, impedir dados inválidos e informar quando uma operação não foi concluída.
 
-- **Cadastrar** um professor.
-- **Consultar** a lista de professores.
-- **Editar** os dados de um professor.
-- **Excluir** um professor.
+## 1. Verificando o resultado das requisições HTTP
 
-Essas quatro operações formam o CRUD, sigla para *Create, Read, Update e Delete*.
+No frontend, as operações de cadastro e edição utilizam `fetch()` para enviar dados à API.
 
-## 1. Preparando o ambiente
+Inicialmente, o código convertia a resposta para JSON sem verificar se a requisição havia sido bem-sucedida.
 
-Este exercício é uma continuação do EX09. Copiamos o projeto anterior para manter a API já implementada e concentrar o trabalho na integração com o frontend.
-
-A aplicação utiliza dois servidores:
-
-- **Frontend:** disponibiliza os arquivos HTML, CSS e JavaScript em `http://localhost:8000`.
-- **Backend:** disponibiliza a API em `http://localhost:3000`.
-
-Inicie os dois servidores conforme as instruções dos exercícios anteriores e abra a página no navegador.
-
-## 2. A interface da aplicação
-
-O arquivo `index.html` contém o formulário de cadastro e a tabela de professores.
-
-O formulário possui campos para nome e área de atuação. O botão de envio é identificado pelo atributo `id="botao-salvar"`.
-
-A tabela apresenta as seguintes colunas:
-
-| Coluna | Finalidade |
-|---|---|
-| ID | Identificar o professor |
-| Nome | Exibir o nome |
-| Área | Exibir a área de atuação |
-| Ações | Disponibilizar os botões Editar e Excluir |
-
-O arquivo `style.css` define a apresentação visual, enquanto `script.js` implementa a interação com a API.
-
-## 3. Carregando os professores
-
-Quando a página é aberta, o JavaScript chama a função `carregarProfessores()`.
-
-Essa função realiza uma requisição `GET` para:
-
-`http://localhost:3000/api/professores`
-
-A resposta contém a lista de professores em formato JSON. Para cada elemento recebido, o programa chama `adicionarProfessorNaTabela(professor)`, responsável por criar uma linha na tabela.
-
-Antes de preencher a tabela, a função limpa seu conteúdo. Isso evita que as mesmas linhas sejam adicionadas novamente quando a listagem precisar ser atualizada.
-
-A função `carregarProfessores()` também é utilizada depois das operações de cadastro, edição e exclusão.
-
-## 4. Cadastrando um professor — POST
-
-Quando o usuário envia o formulário, um evento `submit` é executado.
-
-O método `preventDefault()` impede que o navegador execute o envio tradicional do formulário, que provocaria o recarregamento da página.
-
-Em seguida, o JavaScript obtém os valores dos campos e constrói um objeto:
+Acrescentamos a verificação da propriedade `resposta.ok`:
 
 ```javascript
-const professor = {
-    nome: inputNome.value,
-    area: inputArea.value
-};
+.then(function(resposta) {
+    if (!resposta.ok) {
+        throw new Error("Erro na requisição: " + resposta.status);
+    }
+
+    return resposta.json();
+})
 ```
 
-O objeto é convertido para JSON por meio de `JSON.stringify()` e enviado à API utilizando o método HTTP `POST`.
+A propriedade `ok` vale `true` quando o status HTTP está entre 200 e 299.
+
+Quando a resposta indica um erro, a instrução `throw` cria um erro e interrompe a sequência normal dos métodos `.then()` seguintes. Esse erro é encaminhado ao `.catch()`.
+
+É importante observar que `fetch()` não rejeita automaticamente a Promise quando recebe respostas HTTP como `400`, `404` ou `500`. Esses status indicam respostas do servidor, e cabe ao código verificar se a operação foi bem-sucedida.
+
+## 2. Tratando erros com catch
+
+O método `.catch()` permite tratar erros ocorridos durante o processamento da Promise, incluindo os erros gerados por `throw`.
+
+No formulário, utilizamos:
 
 ```javascript
-fetch(url, {
-    method: metodo,
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(professor)
+.catch(function(erro) {
+    console.error("Erro ao salvar professor:", erro);
+
+    mensagem.textContent = erro.message;
 });
 ```
 
-O cabeçalho `Content-Type` informa ao servidor que o corpo da requisição contém dados JSON.
+O `console.error()` registra detalhes para facilitar a depuração. Já `mensagem.textContent` apresenta uma mensagem na própria página.
 
-Depois que o servidor salva o novo professor, o JavaScript limpa o formulário e chama `carregarProfessores()` para atualizar a tabela.
+Assim, o usuário não precisa abrir as ferramentas de desenvolvedor para perceber que uma operação falhou.
 
-## 5. Editando um professor — PUT
+O tratamento também impede que o código responsável por limpar o formulário e atualizar a tabela seja executado como se a operação tivesse sido concluída com sucesso.
 
-O botão Editar preenche o formulário com os dados do professor selecionado.
+## 3. Limpando mensagens anteriores
 
-Para identificar que estamos editando um registro, o programa utiliza a variável:
+Para evitar que uma mensagem antiga continue aparecendo durante uma nova tentativa, acrescentamos ao início do evento `submit`:
 
 ```javascript
-let idProfessorEmEdicao = null;
+mensagem.textContent = "";
 ```
 
-Quando nenhum professor está sendo editado, essa variável vale `null`. Ao clicar em Editar, ela recebe o ID do professor selecionado.
+Dessa maneira, cada envio começa sem a mensagem de erro da tentativa anterior.
 
-O botão do formulário também muda de texto para indicar que a operação será uma atualização.
+## 4. Validando os dados no frontend
 
-No envio do formulário, o programa verifica o valor dessa variável:
+Antes de enviar o formulário, verificamos se o nome e a área foram preenchidos.
 
-- Se ela for `null`, utiliza `POST` para cadastrar um professor.
-- Se ela contiver um ID, utiliza `PUT` e acrescenta esse ID ao endereço da API.
+A validação utiliza o método `trim()`, que remove espaços em branco do começo e do fim de uma string.
 
-Por exemplo, para atualizar o professor de ID 3:
+Isso impede que um campo contendo apenas espaços seja considerado válido.
 
-`PUT http://localhost:3000/api/professores/3`
+Quando algum campo está vazio, a aplicação apresenta uma mensagem e utiliza `return` para encerrar o tratamento do evento antes de chamar `fetch()`.
 
-O servidor atualiza os dados e devolve uma resposta. Em seguida, o frontend limpa o formulário, retorna ao modo de cadastro e recarrega a tabela.
+Essa validação melhora a experiência do usuário, pois permite identificar o problema antes de enviar a requisição.
 
-Essa solução permite utilizar o mesmo formulário tanto para cadastrar quanto para editar.
+## 5. Validando os dados no backend
 
-## 6. Excluindo um professor — DELETE
+A validação no frontend não substitui a validação no backend. Uma pessoa pode enviar requisições diretamente à API, utilizando ferramentas como Postman, sem passar pelo formulário.
 
-Cada linha da tabela possui um botão Excluir.
+No início do exercício, a API já validava os dados recebidos pelo `POST`, mas não aplicava a mesma regra ao `PUT`. Isso permitia atualizar um professor com campos vazios.
 
-O evento de clique desse botão realiza uma requisição `DELETE` para o endereço correspondente ao professor selecionado.
+Corrigimos essa inconsistência e passamos a validar os dados nas duas operações.
 
-Por exemplo:
+A condição utilizada verifica se os valores são strings e se não estão vazios após a remoção dos espaços:
 
-`DELETE http://localhost:3000/api/professores/3`
+```javascript
+if (
+    typeof dados.nome !== "string" ||
+    !dados.nome.trim() ||
+    typeof dados.area !== "string" ||
+    !dados.area.trim()
+) {
+    res.writeHead(400);
 
-Nesse caso, não é necessário enviar um corpo na requisição: o ID presente no endereço identifica o registro que deve ser excluído.
+    res.end(JSON.stringify({
+        erro: "Nome e área são obrigatórios"
+    }));
 
-Depois de receber a resposta da API, o frontend chama `carregarProfessores()` novamente. Assim, a tabela passa a exibir apenas os professores que permanecem cadastrados.
+    return;
+}
+```
 
-A exclusão é executada imediatamente, sem uma etapa de confirmação.
+A validação deve aparecer tanto no tratamento do `POST` quanto no tratamento do `PUT`.
 
-## 7. Comunicação entre frontend e backend
+### Por que usamos typeof?
 
-O fluxo geral da aplicação é:
+O operador `typeof` permite verificar o tipo de um valor.
 
-1. O usuário realiza uma ação na interface.
-2. O JavaScript identifica o evento.
-3. O frontend envia uma requisição HTTP à API.
-4. O backend executa a operação solicitada.
-5. O servidor devolve uma resposta em JSON.
-6. O frontend atualiza a interface quando necessário.
+Como a API espera strings nos campos `nome` e `area`, rejeitamos valores de outros tipos. Isso também evita tentar executar `.trim()` em valores como `null` ou números.
 
-Essa comunicação utiliza `fetch()`, que permite fazer requisições HTTP a partir do JavaScript.
+A condição `!dados.nome.trim()` verifica se a string fica vazia depois da remoção dos espaços.
 
-A chamada `resposta.json()` converte o corpo da resposta em um valor JavaScript. Como essa conversão é assíncrona, ela é utilizada dentro de uma cadeia de Promises com `.then()`.
+O status HTTP `400` indica que a requisição contém dados inválidos para a operação.
 
-## 8. Por que a tabela é recarregada?
+## 6. Por que validar no frontend e no backend?
 
-Depois de cadastrar, editar ou excluir um professor, a função `carregarProfessores()` consulta novamente a API e reconstrói a tabela.
+As duas validações têm finalidades complementares.
 
-Essa estratégia mantém a implementação simples: em vez de criar um código diferente para modificar a tabela em cada operação, reutilizamos uma função responsável por carregar e exibir a lista.
+- **Frontend:** oferece retorno imediato ao usuário e evita requisições desnecessárias.
+- **Backend:** protege a API independentemente da origem da requisição.
 
-O backend continua sendo responsável por manter os dados persistidos no arquivo `dados.json`. A tabela é apenas uma representação desses dados na interface.
+O backend não deve confiar que todos os clientes validarão os dados corretamente. Por isso, as regras essenciais precisam ser verificadas no servidor.
 
-## 9. CORS e comunicação entre portas diferentes
+## 7. Testando a aplicação
 
-O frontend e o backend utilizam portas diferentes, mesmo estando na mesma máquina. Para o navegador, essas URLs representam origens diferentes.
+Os testes podem ser divididos entre navegador e Postman.
 
-Por isso, o backend precisa permitir a origem do frontend por meio dos cabeçalhos CORS.
+### No navegador
 
-Como a aplicação utiliza os métodos `GET`, `POST`, `PUT` e `DELETE`, o servidor também precisa permitir esses métodos e responder às requisições de verificação `OPTIONS` quando o navegador realizar uma requisição preflight.
+- Cadastrar um professor com nome e área preenchidos.
+- Tentar enviar o formulário com o nome vazio.
+- Tentar enviar o formulário com a área vazia.
+- Preencher um campo somente com espaços.
+- Provocar uma resposta de erro e conferir a mensagem na página.
+- Fazer uma nova tentativa e verificar se a mensagem anterior desaparece.
 
-Essa configuração permite que o navegador autorize a comunicação entre a página e a API.
+### No Postman
 
-## 10. Testando a aplicação
+- Enviar um `POST` com dados válidos.
+- Enviar um `POST` com campos vazios ou preenchidos somente com espaços.
+- Enviar um `PUT` com dados válidos para um professor existente.
+- Enviar um `PUT` com campos inválidos e verificar se os dados anteriores são preservados.
+- Enviar um `PUT` para um ID inexistente e conferir a resposta `404`.
+- Enviar valores que não sejam strings em `nome` e `area`.
 
-Verifique se todas as operações funcionam:
+As requisições inválidas devem ser rejeitadas com status `400`. Uma tentativa de atualizar um professor inexistente deve retornar `404`.
 
-- Abra a página e confira se a lista de professores é carregada.
-- Cadastre um professor e verifique se ele aparece na tabela.
-- Edite seu nome ou sua área e confira a atualização.
-- Exclua um professor e confirme que ele desaparece da tabela.
-- Recarregue a página e confira se as alterações persistiram.
-
-Também é possível acompanhar as requisições na aba Network das ferramentas de desenvolvedor do navegador.
-
-## 11. Conceitos aprendidos
+## 8. Conceitos aprendidos
 
 Neste exercício, trabalhamos com:
 
-- Manipulação do DOM para criar linhas e botões dinamicamente.
-- Eventos de formulário e de clique.
-- Requisições HTTP com `fetch()`.
-- Métodos HTTP `GET`, `POST`, `PUT` e `DELETE`.
-- Envio e recebimento de dados JSON.
-- Promises e encadeamento com `.then()`.
-- Identificação de registros por meio de IDs.
-- Reutilização de funções.
-- Separação entre frontend, backend e persistência de dados.
-- CORS e comunicação entre origens diferentes.
+- Status HTTP e a propriedade `resposta.ok`.
+- Erros gerados com `throw new Error()`.
+- Tratamento de erros com `.catch()`.
+- Promises e interrupção do fluxo normal de execução.
+- Exibição de mensagens no DOM com `textContent`.
+- Validação de campos com `trim()`.
+- Verificação de tipos com `typeof`.
+- Diferenças entre validação no frontend e no backend.
+- Uso de status HTTP para indicar falhas.
+- Testes de API com Postman.
 
 ## Conclusão
 
-Com o EX10, concluímos a implementação de uma aplicação web que permite realizar as quatro operações do CRUD por meio de uma interface gráfica.
+Com o EX11, a aplicação passou a tratar melhor as respostas de erro e a rejeitar dados inválidos tanto no frontend quanto no backend.
 
-A aplicação ainda utiliza um arquivo JSON como forma de persistência, e a API foi implementada com os recursos nativos do Node.js. Essa abordagem permite compreender os fundamentos da comunicação entre navegador e servidor antes de introduzir frameworks ou bancos de dados.
+Essas melhorias tornam o comportamento da aplicação mais previsível e ajudam a evitar alterações indevidas nos dados.
 
-**Próximo passo:** revisar a organização do código e consolidar os conhecimentos adquiridos antes de avançar para novas tecnologias.
+A API continua implementada com os recursos nativos do Node.js, e os dados permanecem armazenados no arquivo `dados.json`.
+
+**Próximo passo:** melhorar as mensagens e a experiência de uso da interface, mantendo a simplicidade do código antes de introduzir novas tecnologias.

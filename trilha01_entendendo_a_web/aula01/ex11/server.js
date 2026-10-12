@@ -27,11 +27,12 @@ const servidor = http.createServer(function (req, res) {
 
             try{
                 const dados = JSON.parse(corpo);
-                if (!dados.nome || !dados.area) {
+                if (typeof dados.nome !== "string" || !dados.nome.trim() ||
+                    typeof dados.area !== "string" || !dados.area.trim()) {
                     res.writeHead(400);
 
                     res.end(JSON.stringify({
-                        erro: "Nome e área são obrigatórios"
+                        erro: "Nome e área são obrigatórios (Ambos em formato texto)"
                     }));
 
                     return;
@@ -81,6 +82,16 @@ const servidor = http.createServer(function (req, res) {
         req.on("end", function() {
             try {
                 const dados = JSON.parse(corpo)
+                if (typeof dados.nome !== "string" || !dados.nome.trim() ||
+                    typeof dados.area !== "string" || !dados.area.trim()) {
+                    res.writeHead(400);
+
+                    res.end(JSON.stringify({
+                        erro: "Nome e área são obrigatórios (Ambos em formato texto)"
+                    }));
+
+                    return;
+                }
 
                 const dadosArquivo = fs.readFileSync("dados.json", "utf-8");
                 const professores = JSON.parse(dadosArquivo);

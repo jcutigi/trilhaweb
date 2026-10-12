@@ -76,10 +76,18 @@ const formulario = document.querySelector("#form-professor")
 
 formulario.addEventListener("submit", function(evento) {
     evento.preventDefault(); // Impede o comportamento padrão do formulário, que faria o navegador recarregar a página.
+    
+    const mensagem = document.querySelector("#mensagem");
+    mensagem.textContent = "";
 
     const inputNome = document.querySelector("#nome");
     const inputArea = document.querySelector("#area");
     const botaoSalvar = document.querySelector("#botao-salvar");
+
+    if (inputNome.value.trim() === "" || inputArea.value.trim() === "") {
+        mensagem.textContent = "Preencha o nome e a área do professor.";
+        return;       
+    }
 
     const professor = {
         nome: inputNome.value,
@@ -104,7 +112,6 @@ formulario.addEventListener("submit", function(evento) {
     .then(function(resposta) {
         if (! resposta.ok) {
             throw new Error("Erro na requisição: " + resposta.status);
-            
         }
         return resposta.json();
     })
@@ -120,6 +127,7 @@ formulario.addEventListener("submit", function(evento) {
     })
     .catch(function(erro) {
         console.error("Erro ao salvar professor:", erro);
+        mensagem.textContent = erro.message;
     });
 
 });
