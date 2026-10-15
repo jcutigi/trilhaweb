@@ -102,3 +102,28 @@ th {
     color: #721c24;
     background-color: #f8d7da;
 }
+
+.tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Ajustes para telas pequenas */
+@media (max-width: 600px) {
+    main {
+        padding: 0 10px;
+    }
+
+    section {
+        padding: 16px;
+    }
+
+    input {
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+    }
+}
