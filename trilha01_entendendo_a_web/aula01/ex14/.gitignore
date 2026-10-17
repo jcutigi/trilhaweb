@@ -1,0 +1,12 @@
+# Dependências instaladas pelo npm
+node_modules/
+
+# Arquivos com variáveis de ambiente e credenciais
+.env
+.env.*
+
+# Permite versionar um modelo sem segredos
+!.env.example
+
+# Logs
+npm-debug.log*
