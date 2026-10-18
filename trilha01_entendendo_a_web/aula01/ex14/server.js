@@ -1,8 +1,8 @@
 const http = require("http");
-const fs = require("fs");
+const pool = require("./db");
 
 // Cria o servidor HTTP. A função será executada sempre que uma requisição chegar.
-const servidor = http.createServer(function (req, res) {
+const servidor = http.createServer(async function (req, res) {
     res.setHeader("Access-Control-Allow-Origin", "http://localhost:8000");
 
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -23,7 +23,7 @@ const servidor = http.createServer(function (req, res) {
             corpo += parte;
         });
 
-        req.on("end", function () {
+        req.on("end", async function () {
 
             try{
                 const dados = JSON.parse(corpo);
@@ -38,34 +38,32 @@ const servidor = http.createServer(function (req, res) {
                     return;
                 }
 
-                const conteudo = fs.readFileSync("dados.json", "utf-8");
-                const professores = JSON.parse(conteudo);
-    
-                const novoId = professores.length > 0
-                    ? Math.max(...professores.map(function (item) {
-                        return item.id;
-                    })) + 1
-                    : 1;
+                const resultado = await pool.query(
+                    `INSERT INTO professores (nome, area)
+                    VALUES ($1, $2)
+                    RETURNING id, nome, area`,
+                    [dados.nome.trim(), dados.area.trim()]
+                );
 
-                const novoProfessor = {
-                    id: novoId,
-                    nome: dados.nome,
-                    area: dados.area
-                };
-                professores.push(novoProfessor);
-    
-                const novoConteudo = JSON.stringify(professores, null, 4);
+                const novoProfessor = resultado.rows[0];
 
-                fs.writeFileSync("dados.json", novoConteudo);
-    
-                res.writeHead(201); // 201 = recurso criado.
-    
+                res.writeHead(201);
                 res.end(JSON.stringify(novoProfessor));
+
             } catch (erro) {
-                console.error("Erro:", erro);
-                res.writeHead(400); // 400 = Bad Request - estamos tratando principalmente um JSON inválido enviado pelo cliente
+                console.error("Erro ao cadastrar professor:", erro);
+
+                if (erro instanceof SyntaxError) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({
+                        erro: "O corpo da requisição deve ser um JSON válido"
+                    }));
+                    return;
+                }
+
+                res.writeHead(500);
                 res.end(JSON.stringify({
-                    erro: "O corpo da requisição deve ser um JSON válido"
+                    erro: "Erro interno ao cadastrar professor"
                 }));
             }
         });
@@ -74,12 +72,20 @@ const servidor = http.createServer(function (req, res) {
     } else if (req.method === "PUT" && req.url.startsWith("/api/professores")) {
         const id = Number(req.url.split("/")[3]);
 
+        if (!Number.isInteger(id) || id <= 0) {
+            res.writeHead(400);
+            res.end(JSON.stringify({
+                erro: "O ID deve ser um número inteiro positivo"
+            }));
+            return;
+        }
+
         let corpo = ""
         req.on("data", function(parte) {
             corpo += parte
         });
 
-        req.on("end", function() {
+        req.on("end", async function() {
             try {
                 const dados = JSON.parse(corpo)
                 if (typeof dados.nome !== "string" || !dados.nome.trim() ||
@@ -93,13 +99,15 @@ const servidor = http.createServer(function (req, res) {
                     return;
                 }
 
-                const dadosArquivo = fs.readFileSync("dados.json", "utf-8");
-                const professores = JSON.parse(dadosArquivo);
-                const indice = professores.findIndex(function(item) {
-                    return item.id === id;
-                })
-                
-                if (indice === -1) {
+                const resultado = await pool.query(
+                    `UPDATE professores
+                    SET nome = $1, area = $2
+                    WHERE id = $3
+                    RETURNING id, nome, area`,
+                    [dados.nome.trim(), dados.area.trim(), id]
+                );
+
+                if (resultado.rows.length === 0) {
                     res.writeHead(404);
                     res.end(JSON.stringify({
                         erro: "Professor não encontrado"
@@ -107,90 +115,120 @@ const servidor = http.createServer(function (req, res) {
                     return;
                 }
 
-                professores[indice] = {
-                    id: id,
-                    nome: dados.nome,
-                    area: dados.area
+                res.writeHead(200);
+                res.end(JSON.stringify(resultado.rows[0]));
+            } catch (erro) {
+                console.error("Erro ao atualizar professor:", erro);
+
+                if (erro instanceof SyntaxError) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({
+                        erro: "O corpo da requisição deve ser um JSON válido"
+                    }));
+                    return;
                 }
 
-                const novoConteudo = JSON.stringify(professores, null, 4);
-                fs.writeFileSync("dados.json", novoConteudo);
-
-                // console.log("PUT recebido para o professor", id);
-                // console.log("Dados recebidos", dados);
-                // console.log("Índice encontrado", indice);
-                
-                res.writeHead(200);
-                res.end(JSON.stringify(professores[indice]));
-            } catch (erro) {
-                res.writeHead(400);
+                res.writeHead(500);
                 res.end(JSON.stringify({
-                    erro: "O corpo da requisição deve ser um JSON válido"
-                }))
+                    erro: "Erro interno ao atualizar professor"
+                }));
             }
         });
 
-    // GET /api/professores
+    // DELETE /api/professores
     // Se não for o POST acima e a URL for /api/professores, buscamos todos os professores no arquivo JSON.
-    }  else if (req.method === "DELETE" && req.url.startsWith("/api/professores")) {
+    }  else if (req.method === "DELETE" && req.url.startsWith("/api/professores/")) {
         const id = Number(req.url.split("/")[3]);
 
-        const dadosArquivo = fs.readFileSync("dados.json", "utf-8");
-        const professores = JSON.parse(dadosArquivo);
-
-        const indice = professores.findIndex(function (item) {
-            return item.id === id;
-        });
-
-        if (indice === -1) {
-            res.writeHead(404);
+        if (!Number.isInteger(id) || id <= 0) {
+            res.writeHead(400);
             res.end(JSON.stringify({
-                erro: "Professor não encontrado"
+                erro: "O ID deve ser um número inteiro positivo"
             }));
             return;
         }
 
-        const professorExcluido = professores[indice];
+        try {
+            const resultado = await pool.query(
+                `DELETE FROM professores
+                 WHERE id = $1
+                 RETURNING id, nome, area`,
+                [id]
+            );
 
-        professores.splice(indice, 1);
+            if (resultado.rows.length === 0) {
+                res.writeHead(404);
+                res.end(JSON.stringify({
+                    erro: "Professor não encontrado"
+                }));
+                return;
+            }
 
-        const novoConteudo = JSON.stringify(professores, null, 4);
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                mensagem: "Professor excluído com sucesso",
+                professor: resultado.rows[0]
+            }));
 
-        fs.writeFileSync("dados.json", novoConteudo);
+        } catch (erro) {
+            console.error("Erro ao excluir professor:", erro);
 
-        res.writeHead(200);
-        res.end(JSON.stringify({
-            mensagem: "Professor excluído com sucesso",
-            professor: professorExcluido
-        }));
+            res.writeHead(500);
+            res.end(JSON.stringify({
+                erro: "Erro interno ao excluir professor"
+            }));
+        }
     } else if (req.method === "GET" && req.url === "/api/professores") {
-        const dados = fs.readFileSync("dados.json", "utf-8");
+        try {
+            const resultado = await pool.query(
+                "SELECT id, nome, area FROM professores ORDER BY id"
+            );
 
-        const professores = JSON.parse(dados);
+            res.writeHead(200);
+            res.end(JSON.stringify(resultado.rows));
+        } catch (erro) {
+            console.error("Erro ao consultar professores:", erro);
 
-        res.writeHead(200); // 200 = requisição processada com sucesso.
-
-        res.end(JSON.stringify(professores));
-
+            res.writeHead(500);
+            res.end(JSON.stringify({
+                erro: "Erro interno ao consultar professores"
+            }));
+        }
     // GET /api/professores/:id
     } else if (req.method === "GET" && req.url.startsWith("/api/professores/")) {
         const id = Number(req.url.split("/")[3]);
 
-        const dados = fs.readFileSync("dados.json", "utf-8");
-        const professores = JSON.parse(dados);
-
-        const professor = professores.find(function (item) {
-            return item.id === id;
-        });
-
-        if (professor) {
-            res.writeHead(200); // 200 = encontrada com sucesso.
-            res.end(JSON.stringify(professor));
-        } else {
-            res.writeHead(404); // 404 = recurso não encontrado.
-
+        if (!Number.isInteger(id) || id <= 0) {
+            res.writeHead(400);
             res.end(JSON.stringify({
-                erro: "Professor não encontrado"
+                erro: "O ID deve ser um número inteiro positivo"
+            }));
+            return;
+        }
+
+        try {
+            const resultado = await pool.query(
+                "SELECT id, nome, area FROM professores WHERE id = $1",
+                [id]
+            );
+
+            if (resultado.rows.length === 0) {
+                res.writeHead(404);
+                res.end(JSON.stringify({
+                    erro: "Professor não encontrado"
+                }));
+                return;
+            }
+
+            res.writeHead(200);
+            res.end(JSON.stringify(resultado.rows[0]));
+
+        } catch (erro) {
+            console.error("Erro ao consultar professor:", erro);
+
+            res.writeHead(500);
+            res.end(JSON.stringify({
+                erro: "Erro interno ao consultar professor"
             }));
         }
     // QUALQUER OUTRA ROTA
