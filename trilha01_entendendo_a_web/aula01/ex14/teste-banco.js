@@ -1,3 +1,5 @@
+// Exemplo didático de teste de conexão
+
 // Importa a instância do pool de conexões configurada no arquivo db.js local
 const pool = require("./db");
 
