@@ -1,0 +1,129 @@
+/* Configurações gerais da página */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* Cabeçalho */
+header {
+    background-color: #245a81;
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+/* Conteúdo principal */
+main {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 0 20px;
+}
+
+/* Seções */
+section {
+    background-color: white;
+    margin-bottom: 24px;
+    padding: 24px;
+    border-radius: 8px;
+}
+
+/* Títulos */
+h2 {
+    margin-top: 0;
+    color: #245a81;
+}
+
+/* Formulário */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Botões */
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+#botao-salvar {
+    margin-top: 8px;
+    background-color: #245a81;
+    color: white;
+}
+
+#botao-cancelar {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+/* Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #eaf0f5;
+}
+
+/* Mensagens */
+.mensagem {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.mensagem.sucesso {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+.mensagem.erro {
+    color: #721c24;
+    background-color: #f8d7da;
+}
+
+.tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Ajustes para telas pequenas */
+@media (max-width: 600px) {
+    main {
+        padding: 0 10px;
+    }
+
+    section {
+        padding: 16px;
+    }
+
+    input {
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+    }
+}
