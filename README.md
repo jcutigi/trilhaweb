@@ -14,7 +14,8 @@ A trilha parte dos fundamentos e evolui progressivamente para:
 - desenvolvimento backend;
 - APIs;
 - bancos de dados;
-- autenticação;
+- frameworks e bibliotecas;
+- autenticação e segurança;
 - testes;
 - arquitetura;
 - Docker;
@@ -25,7 +26,7 @@ A trilha parte dos fundamentos e evolui progressivamente para:
 
 A aprendizagem é baseada em pequenos exercícios práticos.
 
-Cada exercício introduz um conceito novo ou amplia um conceito já estudado.
+Cada exercício introduz um conceito novo ou amplia um conceito já estudado. Sempre que possível, o trabalho parte do código existente, permitindo observar como uma aplicação evolui ao longo do tempo.
 
 O ciclo de trabalho é:
 
@@ -47,9 +48,11 @@ Próximo passo
 
 Os exercícios são deliberadamente incrementais. A ideia é evitar esconder conceitos importantes atrás de frameworks ou abstrações antes de compreender seus fundamentos.
 
+O projeto utiliza uma aplicação de cadastro de professores como base para experimentar diferentes tecnologias e formas de organização.
+
 ## Organização do projeto
 
-A estrutura do projeto é organizada por trilhas, aulas e exercícios:
+A estrutura é organizada por trilhas, aulas e exercícios:
 
 ```text
 trilhaweb/
@@ -59,8 +62,10 @@ trilhaweb/
 └── trilha01_entendendo_a_web/
     │
     ├── README.md
+    |
+    ├── exercicios/
     │
-    └── aula01/
+    └── aulas/
         │
         ├── ex01/
         │   ├── README.md
@@ -70,14 +75,12 @@ trilhaweb/
         │   ├── README.md
         │   └── ...
         │
-        ├── ex03/
-        │   ├── README.md
-        │   └── ...
-        │
         └── ...
 ```
 
-Cada exercício possui seu próprio `README.md`, contendo a explicação conceitual, o que foi construído, os conceitos introduzidos e orientações para execução e experimentação.
+As próximas trilhas serão acrescentadas seguindo a mesma organização, conforme o conteúdo e a quantidade de exercícios.
+
+Cada exercício possui seu próprio `README.md`, contendo explicações conceituais, o que foi construído, os conceitos introduzidos e orientações para execução e experimentação.
 
 Dessa forma, o repositório funciona simultaneamente como:
 
@@ -87,97 +90,91 @@ Dessa forma, o repositório funciona simultaneamente como:
 - material de estudo;
 - histórico da evolução do projeto.
 
-## Trilhas planejadas
+## Trilhas de aprendizagem
 
 ### Trilha 01 — Entendendo a Web de verdade
 
-Fundamentos necessários para compreender como uma aplicação Web funciona.
+**Status: concluída.**
 
-Principais conceitos:
+Fundamentos necessários para compreender como uma aplicação Web funciona, desde a interação com o navegador até a persistência dos dados.
 
-- navegador;
-- HTML;
-- DOM;
-- JavaScript;
-- eventos;
-- HTTP;
+Principais conceitos trabalhados:
+
+- HTML, CSS e JavaScript;
+- DOM e eventos;
+- requisições HTTP;
 - JSON;
 - cliente e servidor;
-- APIs;
 - frontend e backend;
-- CORS.
+- APIs e CORS;
+- métodos e códigos de status HTTP;
+- operações CRUD;
+- Node.js sem frameworks;
+- Postman para testar APIs;
+- PostgreSQL e SQL;
+- conexão entre backend e banco de dados;
+- variáveis de ambiente;
+- Git e GitHub.
+
+Ao final, foi construída uma aplicação de cadastro de professores com frontend, API própria em Node.js e persistência em PostgreSQL.
 
 [Ver Trilha 01](./trilha01_entendendo_a_web/)
 
-### Trilha 02 — Backend com Node.js
+### Trilha 02 — Frameworks no desenvolvimento Web
 
-Desenvolvimento de aplicações backend utilizando Node.js.
+**Próxima etapa.**
 
-Conteúdos previstos:
+Introdução às abstrações e ferramentas utilizadas no desenvolvimento de aplicações Web modernas, aproveitando a aplicação construída na Trilha 01 como referência.
 
-- Node.js;
-- Express;
-- organização de APIs;
-- rotas;
-- middleware;
-- tratamento de erros;
-- arquitetura básica de backend.
-
-### Trilha 03 — PostgreSQL e persistência
-
-Substituição das fontes de dados utilizadas nos exercícios por um banco de dados relacional.
+A ideia é compreender quais problemas os frameworks resolvem e como se relacionam com os mecanismos já estudados.
 
 Conteúdos previstos:
 
-- PostgreSQL;
-- SQL;
-- modelagem;
-- conexão entre aplicação e banco;
-- CRUD persistente;
-- transações.
-
-### Trilha 04 — React
-
-Desenvolvimento de interfaces utilizando React.
-
-Conteúdos previstos:
-
+- estrutura de projetos com npm e Vite;
+- React;
 - componentes;
-- estado;
-- propriedades;
-- eventos;
-- formulários;
-- consumo de APIs;
-- organização de aplicações frontend.
+- propriedades e estado;
+- eventos e formulários;
+- renderização de interfaces;
+- consumo da API existente;
+- Express;
+- rotas e middleware;
+- comparação entre JavaScript puro e frameworks;
+- comparação entre a API construída com Node.js puro e uma implementação com Express.
 
-### Trilha 05 — TypeScript
+A abordagem continuará incremental: primeiro, a evolução do frontend; depois, a introdução de abstrações no backend.
+
+### Trilha 03 — TypeScript
 
 Introdução à tipagem estática aplicada ao desenvolvimento Web.
 
 Conteúdos previstos:
 
-- tipos;
-- interfaces;
+- tipos primitivos;
 - tipos de objetos;
+- interfaces;
 - funções;
-- integração com React e backend.
+- tipagem de dados recebidos de APIs;
+- integração com React e backend;
+- diferenças entre JavaScript e TypeScript.
 
-### Trilha 06 — Autenticação e segurança
+### Trilha 04 — Autenticação e segurança
 
 Introdução aos principais mecanismos de segurança de aplicações Web.
 
 Conteúdos previstos:
 
-- autenticação;
-- autorização;
+- autenticação e autorização;
+- identificação de usuários;
+- senhas e armazenamento seguro;
 - sessões;
 - tokens;
-- senhas;
 - JWT;
+- controle de acesso às APIs;
 - CORS;
 - boas práticas de segurança.
 
-### Trilha 07 — Engenharia da aplicação
+### Trilha 05 — Engenharia da aplicação
 
 Evolução do projeto para uma estrutura mais próxima de aplicações profissionais.
 
@@ -185,92 +182,107 @@ Conteúdos previstos:
 
 - arquitetura;
 - separação de responsabilidades;
-- testes;
-- tratamento de erros;
+- organização de módulos;
+- validação e tratamento de erros;
+- testes automatizados;
 - logs;
 - configuração;
-- variáveis de ambiente.
+- variáveis de ambiente;
+- qualidade e manutenção do código.
 
-### Trilha 08 — Docker
+### Trilha 06 — Docker
 
 Introdução à containerização da aplicação.
 
 Conteúdos previstos:
 
-- imagens;
-- containers;
+- imagens e containers;
 - Dockerfile;
 - Docker Compose;
-- aplicação + banco de dados.
+- configuração de ambientes;
+- aplicação e banco de dados em containers;
+- comunicação entre serviços.
 
-### Trilha 09 — Deploy e CI/CD
+### Trilha 07 — Deploy e CI/CD
 
 Colocação da aplicação em produção e automação do processo de entrega.
 
 Conteúdos previstos:
 
+- hospedagem de frontend e backend;
+- configuração de produção;
+- variáveis de ambiente;
 - deploy;
-- ambientes;
 - integração contínua;
 - entrega contínua;
 - pipelines;
-- configuração de produção.
+- execução de testes no processo de integração.
 
-### Trilha 10 — Full-stack e Next.js
+### Trilha 08 — Full-stack e Next.js
 
-Ao final, serão comparadas diferentes formas de estruturar aplicações Web modernas.
+Estudo de diferentes formas de estruturar aplicações Web modernas, integrando os conhecimentos desenvolvidos nas trilhas anteriores.
 
-Entre os temas:
+Conteúdos previstos:
 
 - frontend e backend separados;
 - aplicações full-stack;
 - Next.js;
-- server-side rendering;
-- comparação entre arquiteturas.
+- renderização no servidor (SSR);
+- renderização no cliente;
+- rotas e APIs;
+- comparação entre arquiteturas;
+- vantagens e limitações de diferentes abordagens.
+
+A sequência e o escopo das trilhas poderão ser ajustados conforme as necessidades identificadas durante o desenvolvimento.
 
 ## Tecnologias
 
-A trilha deverá utilizar progressivamente tecnologias como:
+As tecnologias serão introduzidas progressivamente, conforme os conceitos e os objetivos de cada etapa.
 
 ```text
-HTML
-CSS
-JavaScript
-        ↓
-Node.js
-        ↓
-Express
-        ↓
-PostgreSQL
-        ↓
-React
-        ↓
-TypeScript
-        ↓
-Docker
-        ↓
-Deploy / CI/CD
+HTML + CSS + JavaScript
+          ↓
+     HTTP e APIs
+          ↓
+   Node.js sem framework
+          ↓
+      PostgreSQL
+          ↓
+       React
+          ↓
+       Express
+          ↓
+     TypeScript
+          ↓
+Autenticação e testes
+          ↓
+        Docker
+          ↓
+     Deploy / CI/CD
+          ↓
+     Full-stack / Next.js
 ```
 
-As tecnologias podem ser introduzidas gradualmente conforme os conceitos exigirem.
+A sequência representa o planejamento geral, não uma dependência rígida entre todas as tecnologias. Sempre que fizer sentido, conceitos já estudados serão reutilizados para facilitar a comparação entre diferentes abordagens.
 
 ## Controle de versão
 
-O projeto utiliza Git para registrar a evolução do código e da documentação.
+O projeto utiliza Git para registrar a evolução do código e da documentação. O repositório remoto está hospedado no GitHub.
 
-O repositório remoto está hospedado no GitHub.
+Os commits devem representar etapas significativas do desenvolvimento e da aprendizagem.
 
-A intenção é que os commits representem etapas significativas do desenvolvimento e da aprendizagem.
-
-Exemplo:
+Exemplos:
 
 ```text
 Cria exercícios iniciais da trilha Web
-Adiciona documentação dos exercícios da aula 01
+Documenta os fundamentos de HTTP e JSON
 Implementa CRUD da API
 Integra API com PostgreSQL
-...
+Organiza frontend e backend
+Adiciona configuração por variáveis de ambiente
 ```
+
+Credenciais, senhas e outros dados sensíveis não devem ser versionados. Arquivos de configuração de exemplo podem ser utilizados para documentar as variáveis necessárias sem expor valores reais.
 
 ## Princípio da trilha
 
@@ -281,3 +293,5 @@ A ideia central desta trilha é:
 Frameworks, bibliotecas e ferramentas são importantes, mas seu uso deve estar apoiado na compreensão dos mecanismos fundamentais da Web.
 
 Por isso, os primeiros exercícios utilizam recursos simples e, somente depois, introduzem abstrações mais sofisticadas.
+
+O objetivo não é apenas conseguir construir uma aplicação, mas compreender **como ela funciona, por que foi organizada dessa maneira e quais alternativas existem**.

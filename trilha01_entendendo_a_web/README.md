@@ -1,182 +1,134 @@
-# Aula 01 — Entendendo a Web
+# Trilha 01 — Entendendo a Web
 
 ## Objetivo
 
-Nesta primeira etapa, vamos construir uma visão prática de como uma aplicação Web funciona.
+Construir uma visão prática de como uma aplicação Web funciona, desde a execução de JavaScript no navegador até a comunicação com um servidor e a persistência dos dados em um banco de dados.
 
-A ideia não é começar por frameworks ou bibliotecas, mas entender os elementos fundamentais que aparecem por trás deles:
+A proposta é compreender os mecanismos fundamentais da Web antes de introduzir frameworks e bibliotecas que abstraem parte de sua complexidade.
 
-- navegador;
-- HTML;
-- JavaScript;
-- DOM;
-- eventos;
-- HTTP;
-- JSON;
+Ao longo desta trilha, desenvolvemos uma aplicação de cadastro de professores, evoluindo gradualmente sua estrutura e suas funcionalidades.
+
+## Conteúdos estudados
+
+### 1. Fundamentos do frontend
+
+- Papel do navegador na execução de aplicações Web;
+- HTML e estrutura de documentos;
+- JavaScript no navegador;
+- DOM (*Document Object Model*);
+- eventos e interação com o usuário;
+- manipulação dinâmica da interface;
+- formulários e validação de dados.
+
+### 2. Comunicação na Web
+
+- HTTP e o modelo de requisição e resposta;
+- métodos HTTP e códigos de status;
+- JSON como formato de representação e transporte de dados;
 - cliente e servidor;
-- APIs.
+- frontend e backend;
+- APIs Web;
+- CORS e requisições entre origens diferentes;
+- ferramentas para testar APIs, como o Postman.
 
-Ao longo dos exercícios, esses conceitos serão introduzidos gradualmente e conectados entre si.
+### 3. Desenvolvimento backend
 
-## 1. O navegador
+- execução de JavaScript com Node.js;
+- criação de um servidor HTTP sem frameworks;
+- tratamento de requisições e respostas;
+- definição e identificação de rotas;
+- recebimento e interpretação de dados enviados pelo cliente;
+- operações CRUD;
+- validação de dados;
+- tratamento de erros;
+- organização básica do código backend.
 
-O navegador é o programa que permite acessar e executar aplicações Web.
+### 4. Persistência de dados
 
-Ao acessar uma página, o navegador pode:
+- leitura e gravação de arquivos JSON;
+- diferença entre dados em memória e dados persistidos;
+- fundamentos de SQL e PostgreSQL;
+- conexão entre Node.js e PostgreSQL;
+- execução de operações CRUD em um banco de dados relacional;
+- configuração da aplicação por variáveis de ambiente.
 
-- solicitar arquivos a um servidor;
-- interpretar HTML;
-- construir o DOM;
-- executar JavaScript;
-- realizar requisições HTTP;
-- receber e interpretar dados;
-- atualizar a interface apresentada ao usuário.
+### 5. Organização do projeto
 
-Por isso, o navegador não é apenas um "visualizador de páginas". Ele também é um ambiente de execução para aplicações Web.
+- separação entre frontend e backend;
+- organização de arquivos e responsabilidades;
+- gerenciamento de dependências com npm;
+- uso de Git e GitHub;
+- documentação dos exercícios;
+- evolução incremental do código.
 
-## 2. HTML
+## Projeto desenvolvido
 
-HTML descreve a estrutura e o conteúdo da página.
+Ao longo da trilha, construímos uma aplicação de cadastro de professores.
 
-Por exemplo, podemos representar um título:
+A aplicação evoluiu de experimentos simples no navegador para uma estrutura com frontend, API própria e banco de dados relacional.
 
-```html
-<h1>Minha aplicação Web</h1>
-```
-
-O HTML define elementos como títulos, parágrafos, botões, listas e formulários.
-
-## 3. JavaScript
-
-JavaScript permite adicionar comportamento à página.
-
-Com JavaScript, podemos:
-
-- reagir às ações do usuário;
-- alterar elementos da página;
-- realizar cálculos;
-- fazer requisições;
-- receber dados de APIs;
-- atualizar a interface sem recarregar toda a página.
-
-Uma forma simples de pensar é:
-
-> HTML define a estrutura; JavaScript define comportamentos e interações.
-
-## 4. DOM
-
-Quando o navegador carrega um documento HTML, ele cria uma representação estruturada desse documento chamada **DOM (Document Object Model)**.
-
-O JavaScript pode acessar e modificar essa representação.
-
-Assim, quando um programa JavaScript altera um texto, cria um elemento ou modifica um atributo, ele está modificando o DOM mantido pelo navegador.
-
-Isso permite que a interface seja atualizada dinamicamente.
-
-## 5. Eventos
-
-Aplicações Web precisam reagir a acontecimentos.
-
-Exemplos:
-
-- usuário clicar em um botão;
-- usuário digitar em um campo;
-- página terminar de carregar;
-- resposta de uma requisição chegar.
-
-Esses acontecimentos são representados por **eventos**.
-
-O JavaScript pode registrar uma função para ser executada quando determinado evento ocorrer.
-
-A ideia geral é:
-
-**ação → evento → JavaScript → alteração da interface**
-
-## 6. HTTP
-
-Quando diferentes partes de uma aplicação Web precisam se comunicar, normalmente utilizamos HTTP.
-
-De forma simplificada:
-
-**cliente → requisição HTTP → servidor**
-
-**cliente ← resposta HTTP ← servidor**
-
-Uma requisição pode solicitar um recurso, enviar dados ou executar alguma operação disponibilizada pelo servidor.
-
-HTTP será retomado nos exercícios seguintes, quando começarmos a trabalhar com APIs.
-
-## 7. JSON
-
-JSON é um formato textual muito utilizado para representar e transportar dados.
-
-Exemplo:
-
-```json
-{
-    "nome": "Bia",
-    "profissao": "Professora"
-}
-```
-
-JSON é especialmente importante no desenvolvimento Web porque é frequentemente utilizado na comunicação entre frontend e backend.
-
-## 8. Cliente e servidor
-
-Uma aplicação Web normalmente envolve pelo menos dois papéis:
-
-**Cliente**
-
-É o programa que faz a requisição. No nosso contexto, normalmente será o navegador.
-
-**Servidor**
-
-É o programa que recebe requisições e produz respostas.
-
-Essa separação permite que o frontend e o backend tenham responsabilidades diferentes.
-
-## 9. API
-
-Uma API Web disponibiliza recursos e operações para que outros programas possam utilizá-los.
-
-Por exemplo:
+Ao final, temos:
 
 ```text
-GET /api/professoras
-```
-
-pode representar uma operação para obter uma coleção de professoras.
-
-O frontend não precisa saber como esses dados são armazenados internamente. Ele conhece a interface oferecida pela API.
-
-Esse conceito será desenvolvido gradualmente nos exercícios.
-
-## Visão geral da aula
-
-A sequência que vamos construir é:
-
-```text
-HTML
-  ↓
-DOM
-  ↓
-JavaScript
-  ↓
-Eventos
-  ↓
-HTTP
-  ↓
-JSON
-  ↓
-Cliente ↔ Servidor
-  ↓
+Navegador
+    │
+    │ HTTP
+    ▼
+Frontend
+HTML + CSS + JavaScript
+    │
+    │ Requisições HTTP
+    ▼
 API
+Node.js
+    │
+    │ Consultas SQL
+    ▼
+PostgreSQL
 ```
 
-Os exercícios não serão independentes. Cada um acrescentará uma peça a essa visão.
+A API disponibiliza operações para listar, consultar, cadastrar, atualizar e excluir professores.
 
-## Ideia central
+O projeto também utiliza configuração por variáveis de ambiente e possui documentação para orientar sua execução e experimentação.
 
-Antes de aprender frameworks, bibliotecas e arquiteturas mais complexas, é importante entender o mecanismo básico sobre o qual essas tecnologias são construídas.
+## Organização da trilha
 
-A proposta desta aula é justamente construir essa base por meio de pequenos experimentos práticos.
+A trilha está organizada em duas partes complementares.
+
+### `aulas/`
+
+Contém o material didático utilizado para estudar os conceitos, compreender os mecanismos envolvidos e estabelecer as relações entre os diferentes componentes de uma aplicação Web.
+
+### `exercícios/`
+
+Contém as implementações práticas que permitem experimentar os conceitos estudados, acompanhar a evolução da aplicação e consultar o código-fonte.
+
+Cada exercício deve possuir documentação própria, explicando seus objetivos, os conceitos introduzidos e as orientações para execução.
+
+## Resultado esperado
+
+Ao concluir esta trilha, o estudante deve ser capaz de compreender o fluxo básico de uma aplicação Web e explicar o papel de seus principais componentes.
+
+Em particular, deve compreender como:
+
+- o navegador interpreta HTML e executa JavaScript;
+- eventos permitem reagir às ações do usuário;
+- o frontend envia requisições HTTP;
+- uma API recebe requisições e produz respostas;
+- o backend valida e processa dados;
+- a aplicação consulta e modifica informações no banco de dados;
+- diferentes componentes se comunicam para formar uma aplicação completa.
+
+## Próxima etapa
+
+A Trilha 01 estabelece a base para a próxima etapa: **Trilha 02 — Frameworks no desenvolvimento Web**.
+
+Nela, vamos estudar ferramentas como React e Express, comparando suas abstrações com os mecanismos que implementamos nesta trilha.
+
+A intenção é compreender não apenas como utilizar essas tecnologias, mas também quais problemas elas resolvem e quais responsabilidades continuam existindo por trás delas.
+
+## Princípio da trilha
+
+> **Entender primeiro, abstrair depois.**
+
+O objetivo não é apenas construir uma aplicação funcional, mas compreender como ela funciona e por que suas diferentes partes foram organizadas dessa maneira.
