@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Front-end + API com JSON</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Professores</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -28,7 +29,7 @@
                 <button type="button" id="botao-cancelar" hidden>Cancelar edição</button>
             </form>
 
-            <p id="mensagem"></p>
+            <p id="mensagem" role="status" aria-live="polite"></p>
         </section>
 
         <section>
@@ -53,6 +54,7 @@
         </section>
     </main>
 
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

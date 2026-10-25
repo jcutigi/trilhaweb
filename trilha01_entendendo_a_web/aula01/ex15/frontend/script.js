@@ -1,23 +1,50 @@
 let idProfessorEmEdicao = null;
 
+function limparFormulario() {
+    const inputNome = document.querySelector("#nome");
+    const inputArea = document.querySelector("#area");
+    const botaoSalvar = document.querySelector("#botao-salvar");
+    const botaoCancelar = document.querySelector("#botao-cancelar");
+    const mensagem = document.querySelector("#mensagem");
+
+    inputNome.value = "";
+    inputArea.value = "";
+
+    idProfessorEmEdicao = null;
+    botaoSalvar.textContent = "Cadastrar";
+    botaoCancelar.hidden = true;
+
+    mensagem.textContent = "";
+    mensagem.className = "";
+}
+
+
 function adicionarProfessorNaTabela(professor) {
     const tabela = document.querySelector("#tabela-professores");
     const linha = document.createElement("tr");
 
-    linha.innerHTML = `
-        <td>${professor.id}</td>
-        <td>${professor.nome}</td>
-        <td>${professor.area}</td>
-        <td>
-            <button class="botao-editar">Editar</button>
-            <button class="botao-excluir">Excluir</button>
-        </td>
-    `;
-    tabela.append(linha);
+    const celulaId = document.createElement("td");
+    celulaId.textContent = professor.id;
 
-    // Usamos linha.querySelector(...) em vez de document.querySelector(...)
-    // porque queremos encontrar o botão daquela linha, e não o primeiro botão Editar da tabela inteira.
-    const botaoEditar = linha.querySelector(".botao-editar");
+    const celulaNome = document.createElement("td");
+    celulaNome.textContent = professor.nome;
+
+    const celulaArea = document.createElement("td");
+    celulaArea.textContent = professor.area;
+
+    const celulaAcoes = document.createElement("td");
+
+    const botaoEditar = document.createElement("button");
+    botaoEditar.textContent = "Editar";
+    botaoEditar.className = "botao-editar";
+
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.className = "botao-excluir";
+
+    celulaAcoes.append(botaoEditar, botaoExcluir);
+    linha.append(celulaId, celulaNome, celulaArea, celulaAcoes);
+    tabela.append(linha);
 
     botaoEditar.addEventListener("click", function () {
         idProfessorEmEdicao = professor.id;
@@ -33,16 +60,18 @@ function adicionarProfessorNaTabela(professor) {
         botaoCancelar.hidden = false;
     });
 
-    const botaoExcluir = linha.querySelector(".botao-excluir");
-
     botaoExcluir.addEventListener("click", function () {
         if (!confirm(`Deseja realmente excluir o professor ${professor.nome}?`)) {
            return;
         }
-        fetch("http://localhost:3000/api/professores/" + professor.id, {
+        fetch(API_BASE_URL + "/api/professores/" + professor.id, {
             method: "DELETE"
         })
         .then(function (resposta) {
+            if (!resposta.ok) {
+                throw new Error("Erro na requisição: " + resposta.status);
+            }
+
             return resposta.json();
         })
         .then(function (resultado) {
@@ -52,6 +81,10 @@ function adicionarProfessorNaTabela(professor) {
         })
         .catch(function (erro) {
             console.error("Erro ao excluir professor:", erro);
+
+            const mensagem = document.querySelector("#mensagem");
+            mensagem.textContent = "Não foi possível excluir o professor. Tente novamente.";
+            mensagem.className = "mensagem erro";
         });
     });
 }
@@ -59,40 +92,37 @@ function adicionarProfessorNaTabela(professor) {
 const botaoCancelar = document.querySelector("#botao-cancelar");
 
 botaoCancelar.addEventListener("click", function() {
-    const inputNome = document.querySelector("#nome");
-    const inputArea = document.querySelector("#area");
-    const botaoSalvar = document.querySelector("#botao-salvar");
-    const mensagem = document.querySelector("#mensagem");
-
-    inputNome.value = "";
-    inputArea.value = "";
-
-    idProfessorEmEdicao = null;
-    botaoSalvar.textContent = "Cadastrar";
-    botaoCancelar.hidden = true;
-
-    mensagem.textContent = "";
-    mensagem.className = "";
+    limparFormulario();
 });
+
 
 function carregarProfessores() {
     const tabela = document.querySelector("#tabela-professores");
 
-    tabela.innerHTML = "";
-
-    fetch("http://localhost:3000/api/professores")
+    fetch(API_BASE_URL + "/api/professores")
         .then(function(resposta) {
+            if (!resposta.ok) {
+                throw new Error("Erro na requisição: " + resposta.status);
+            }
+
             return resposta.json();
         })
         .then(function(professores) {
+            tabela.innerHTML = "";
+
             professores.forEach(function(professor) {
                 adicionarProfessorNaTabela(professor);
             });
         })
         .catch(function(erro) {
             console.error("Erro ao carregar professores:", erro);
+            
+            const mensagem = document.querySelector("#mensagem");
+            mensagem.textContent = "Não foi possível carregar os professores. Verifique se a API está disponível.";
+            mensagem.className = "mensagem erro";
         });
 }
+
 
 const formulario = document.querySelector("#form-professor")
 
@@ -105,8 +135,6 @@ formulario.addEventListener("submit", function(evento) {
 
     const inputNome = document.querySelector("#nome");
     const inputArea = document.querySelector("#area");
-    const botaoSalvar = document.querySelector("#botao-salvar");
-    const botaoCancelar = document.querySelector("#botao-cancelar");
 
     if (inputNome.value.trim() === "" || inputArea.value.trim() === "") {
         mensagem.textContent = "Preencha o nome e a área do professor.";
@@ -119,7 +147,7 @@ formulario.addEventListener("submit", function(evento) {
         area: inputArea.value
     };
 
-    let url = "http://localhost:3000/api/professores";
+    let url = API_BASE_URL + "/api/professores";
     let metodo = "POST";
 
     if (idProfessorEmEdicao !== null) {
@@ -143,6 +171,8 @@ formulario.addEventListener("submit", function(evento) {
     .then(function(professorSalvo) {
         console.log("Professor salvo:", professorSalvo);
 
+        limparFormulario();
+        
         if (metodo === "POST") {
             mensagem.textContent = "Professor cadastrado com sucesso!";
         } else {
@@ -150,17 +180,11 @@ formulario.addEventListener("submit", function(evento) {
         }
         mensagem.className = "mensagem sucesso";
 
-        inputNome.value = "";
-        inputArea.value = "";
-        idProfessorEmEdicao = null;
-        botaoSalvar.textContent = "Cadastrar";
-        botaoCancelar.hidden = true;
-
         carregarProfessores();
     })
     .catch(function(erro) {
         console.error("Erro ao salvar professor:", erro);
-        mensagem.textContent = erro.message;
+        mensagem.textContent = "Não foi possível salvar o professor. Verifique se a API está disponível e tente novamente.";
         mensagem.className = "mensagem erro";
     });
 

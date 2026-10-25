@@ -136,7 +136,7 @@ const servidor = http.createServer(async function (req, res) {
         });
 
     // DELETE /api/professores
-    // Se não for o POST acima e a URL for /api/professores, buscamos todos os professores no arquivo JSON.
+    // Exclui um professor específico do banco de dados.
     }  else if (req.method === "DELETE" && req.url.startsWith("/api/professores/")) {
         const id = Number(req.url.split("/")[3]);
 

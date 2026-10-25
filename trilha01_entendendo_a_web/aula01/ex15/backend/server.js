@@ -1,9 +1,23 @@
+require("dotenv").config();
+
 const http = require("http");
 const pool = require("./db");
 
+const PORT = process.env.PORT || 3000;
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:8000";
+
+// Verifica se os dados do professor são válidos.
+function validarProfessor(dados) {
+    return dados &&
+        typeof dados.nome === "string" && dados.nome.trim() !== "" &&
+        typeof dados.area === "string" && dados.area.trim() !== "";
+}
+
+const rotaProfessor = /^\/api\/professores\/(\d+)$/;
+
 // Cria o servidor HTTP. A função será executada sempre que uma requisição chegar.
 const servidor = http.createServer(async function (req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:8000");
+    res.setHeader("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
 
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -16,6 +30,7 @@ const servidor = http.createServer(async function (req, res) {
     }
 
     // POST /api/professores
+    // Cadastra um novo professor.
     if (req.method === "POST" && req.url === "/api/professores") {
         let corpo = "";
 
@@ -27,8 +42,7 @@ const servidor = http.createServer(async function (req, res) {
 
             try{
                 const dados = JSON.parse(corpo);
-                if (typeof dados.nome !== "string" || !dados.nome.trim() ||
-                    typeof dados.area !== "string" || !dados.area.trim()) {
+                if (!validarProfessor(dados)) {
                     res.writeHead(400);
 
                     res.end(JSON.stringify({
@@ -68,9 +82,9 @@ const servidor = http.createServer(async function (req, res) {
             }
         });
     // PUT /api/professores/:id
-    // Aqui tratamos uma URL como: /api/professores/3
-    } else if (req.method === "PUT" && req.url.startsWith("/api/professores")) {
-        const id = Number(req.url.split("/")[3]);
+    // Atualiza os dados de um professor existente.
+    } else if (req.method === "PUT" && rotaProfessor.test(req.url)) {
+        const id = Number(req.url.match(rotaProfessor)[1]);
 
         if (!Number.isInteger(id) || id <= 0) {
             res.writeHead(400);
@@ -88,8 +102,7 @@ const servidor = http.createServer(async function (req, res) {
         req.on("end", async function() {
             try {
                 const dados = JSON.parse(corpo)
-                if (typeof dados.nome !== "string" || !dados.nome.trim() ||
-                    typeof dados.area !== "string" || !dados.area.trim()) {
+                if (!validarProfessor(dados)) {
                     res.writeHead(400);
 
                     res.end(JSON.stringify({
@@ -135,10 +148,10 @@ const servidor = http.createServer(async function (req, res) {
             }
         });
 
-    // DELETE /api/professores
-    // Se não for o POST acima e a URL for /api/professores, buscamos todos os professores no arquivo JSON.
-    }  else if (req.method === "DELETE" && req.url.startsWith("/api/professores/")) {
-        const id = Number(req.url.split("/")[3]);
+    // DELETE /api/professores/:id
+    // Exclui um professor específico.
+    } else if (req.method === "DELETE" && rotaProfessor.test(req.url)) {
+        const id = Number(req.url.match(rotaProfessor)[1]);
 
         if (!Number.isInteger(id) || id <= 0) {
             res.writeHead(400);
@@ -178,6 +191,8 @@ const servidor = http.createServer(async function (req, res) {
                 erro: "Erro interno ao excluir professor"
             }));
         }
+    // GET /api/professores
+    // Lista todos os professores.
     } else if (req.method === "GET" && req.url === "/api/professores") {
         try {
             const resultado = await pool.query(
@@ -195,8 +210,9 @@ const servidor = http.createServer(async function (req, res) {
             }));
         }
     // GET /api/professores/:id
-    } else if (req.method === "GET" && req.url.startsWith("/api/professores/")) {
-        const id = Number(req.url.split("/")[3]);
+    // Consulta um professor pelo ID.
+    } else if (req.method === "GET" && rotaProfessor.test(req.url)) {
+        const id = Number(req.url.match(rotaProfessor)[1]);
 
         if (!Number.isInteger(id) || id <= 0) {
             res.writeHead(400);
@@ -241,9 +257,9 @@ const servidor = http.createServer(async function (req, res) {
     }
 });
 
-// Inicia o servidor na porta 3000.
+// Inicia o servidor na porta defindo no .env.
 // no terminal: 
-servidor.listen(3000, function () {
-    console.log("Servidor rodando em http://localhost:3000");
+servidor.listen(PORT, function () {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
